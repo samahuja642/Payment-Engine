@@ -1,0 +1,27 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: always
+    volumes: ['mongo_data:/data/db']
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --appendonly yes
+    volumes: ['redis_data:/data']
+  
+  app:
+    build: .
+    ports: ['8000:8000']                     # only app is exposed to outside
+    environment:
+      - NODE_ENV=production
+      - MONGO_URL=mongodb://mongo:27017/mydb
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - mongo
+      - redis
+    restart: always
+
+volumes:
+  mongo_data:
+  redis_data:
